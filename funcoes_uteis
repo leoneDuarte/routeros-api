@@ -1,0 +1,199 @@
+<?php
+
+
+//LEONE DUARTE DE OLIVEIRA
+//LEONE-DUARTE@OUTLOOK.COM
+//09/01/2019
+
+require('../routeros_api.class.php');
+
+//EXIBINDO A TELA ARP NO MIKROTIK
+function ip_arp($ip, $username, $password){			
+	//CONECTANDO AO MIKROTIK
+	$API = new RouterosAPI(); 
+	if($API->connect($ip, $username, $password)){
+		$API->write('/ip/arp/print');
+		$READ = $API->read(false);
+		$result = $API->parseResponse($READ);
+		$API->disconnect();
+		//EXIBINDO OS RESULTADOS
+		var_dump($result);			
+		
+	}else{
+		echo "falha ao conectar com o MIKROTIK";			
+	}	
+}
+
+
+//DERRUBANDO PPOE DO CLIENTE
+function derrubar_ppoe($ip,$username,$password,$ppoe){				
+	//CONECTANDO AO MIKROTIK
+	$API = new RouterosAPI(); 
+	$API->connect($ip, $username, $password); 
+	$API->write('/ppp/active/print');
+	$READ = $API->read(false);
+	$result = $API->parseResponse($READ);			
+
+	$cont = 0;
+	while(@$result[$cont] != NULL){
+		$ip_bloqueio = substr($result[$cont]["address"],0,7);
+		if($result[$cont]['name'] == $ppoe){ 
+			 $retorno = $API->comm("/ppp/active/remove", array(
+				"numbers" => $cont,
+			));	
+			$API->disconnect();	
+	    } 	       		  	 
+    	$cont = $cont + 1;         
+	}			
+}			
+	
+
+//EXIBINDO A QUEUES NO MIKROTIK
+function exibir_queue($ip, $username, $password){			
+	//CONECTANDO AO MIKROTIK
+	$API = new RouterosAPI(); 
+	if($API->connect($router, $username, $ip)){
+		$API->write('/queue/simple/print');
+		$READ = $API->read(false);
+		$result = $API->parseResponse($READ);
+		$API->disconnect();
+		var_dump($result);			
+	}else{
+		echo "falha ao conectar com o MIKROTIK";			
+	}	
+}
+
+
+
+//REMOVENDO IP ITEM DA ADDRES LIST, FIREWALL
+function addreslist_Firewall($username, $password, $ip, $nome){					
+	//CONECTANDO AO MIKROTIK
+	$API = new RouterosAPI(); 
+	$API->connect($ip, $username, $password);
+	$API->write('/ip/firewall/address-list/print');
+	$READ = $API->read(false);
+	$result = $API->parseResponse($READ);			
+	$cont = 0;
+	while(@$result[$cont] != NULL){
+		@$nome1 = $result[$cont]['comment'];
+		$nome2 = $nome;
+		$nome1 = str_replace(array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'), '', $nome1); 
+		$nome2 = str_replace(array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'), '', $nome2);
+		$numero = similar_text($nome1, $nome2, $resultado);
+		if($resultado > 80){
+			$API->comm("/ip/firewall/address-list/remove", array(
+				"numbers" => $cont,
+			));
+			$API->write('/ip/firewall/address-list/print');
+			$READ = $API->read(false);
+			$result = $API->parseResponse($READ);	
+			$API->disconnect();				
+		}
+	   		$cont = $cont + 1;  
+	}
+}
+
+
+//EXIBINDO COS PPOES DOS CLIENTES
+function ppp($ip, $username, $password){	
+	
+	$API = new RouterosAPI();
+
+	if($API->connect($ip, $username, $password)){ 
+		$API->write('/ppp/active/print');
+		$READ = $API->read(false);
+		$result = $API->parseResponse($READ);
+
+		//EXIBINDO OS RESULTADOS
+		var_dump($result);
+
+	}else{
+		echo "falha ao conectar com o MIKROTIK";	
+	}
+}		
+
+
+//EXIBINDO OS ACCES LIST DOS CLIENTES
+function acces_list($ip, $username, $password){	
+	//CONECTANDO AO MIKROTIK
+	$API = new RouterosAPI(); 	
+	if($API->connect($ip, $username, $password)){ 
+		$API->write('/interface/wireless/access-list/print');
+		$READ = $API->read(false);
+		$result = $API->parseResponse($READ);	
+
+		//EXIBINDO OS RESULTADOS
+		var_dump($result);
+	}else{
+		echo "falha ao conectar com o MIKROTIK";	
+	}
+}		
+
+
+
+//EXIBINDO OS REGISTRATION DOS CLIENTES
+function registration($ip, $username, $password){	
+	//CONECTANDO AO MIKROTIK
+	$API = new RouterosAPI(); 
+	if($API->connect($ip, $username, $password)){ 
+		$API->write('/interface/wireless/registration/print');
+		$READ = $API->read(false);
+		$result = $API->parseResponse($READ);
+
+		//EXIBINDO OS RESULTADOS
+		var_dump($result);
+	}else{
+		echo "falha ao conectar com o MIKROTIK";	
+	}	
+}		
+
+//EXIBINDO OS REGISTRATION DOS CLIENTES
+function registration($ip, $username, $password){	
+	//CONECTANDO AO MIKROTIK
+	$API = new RouterosAPI(); 
+	if($API->connect($ip, $username, $password)){ 
+		$API->write('/interface/wireless/registration/print');
+		$READ = $API->read(false);
+		$result = $API->parseResponse($READ);
+
+		//EXIBINDO OS RESULTADOS
+		var_dump($result);
+	}else{
+		echo "falha ao conectar com o MIKROTIK";	
+	}
+}	
+
+
+
+//EXIBINDO PORTAS ETHER
+function ether($ip, $username, $password){	
+	//CONECTANDO AO MIKROTIK
+	$API = new RouterosAPI(); 
+	if($API->connect($ip, $username, $password)){ 
+		$API->write('/interface/ethernet/print');
+		$READ = $API->read(false);
+		$result = $API->parseResponse($READ);
+
+		//EXIBINDO OS RESULTADOS
+		var_dump($result);
+	}else{
+		echo "falha ao conectar com o MIKROTIK";	
+	}
+}	
+
+
+//EXIBINDO USUARIOS
+function users($ip, $username, $password){	
+	//CONECTANDO AO MIKROTIK
+	$API = new RouterosAPI(); 
+	if($API->connect($ip, $username, $password)){ 
+		$API->write('/user/print');
+		$READ = $API->read(false);
+		$result = $API->parseResponse($READ);
+
+		//EXIBINDO OS RESULTADOS
+		var_dump($result);
+	}else{
+		echo "falha ao conectar com o MIKROTIK";	
+	}
+}	
