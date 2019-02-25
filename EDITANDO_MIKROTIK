@@ -1,0 +1,28 @@
+<?php
+  //LEONE DUARTE DE OLIVEIRA
+	include 'API-MIKROTIK/routeros_api.class.php';	
+	$lines = file ('ips.txt');
+	var_dump($lines);
+	//USUARIO
+	$username = '';
+
+	//SENHA
+	$password = '';
+
+	$cont = 0;
+	while ($lines[$cont] != null) {	
+		echo "ALTERANDO EM ".$lines[$cont];
+		$router = $lines[$cont];	
+		$API = new RouterosAPI(); 
+
+		$API->connect($router, $username, $password); 
+		$API->comm("/ip/service/set", array("numbers" => 2,"port" => 8730,));	
+		$READ = $API->read(false);
+		$response = $API->parseResponse($READ);
+		
+		echo "ALTERADO NA BASE ".$lines[$cont];
+		$API->disconnect();
+		$cont++;
+	}
+	echo "FINALIZADO";		
+?>
