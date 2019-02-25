@@ -1,0 +1,30 @@
+<?php
+  //leone duarte de oliveira
+  
+	include 'API-MIKROTIK/routeros_api.class.php';	
+	//create an archi in txt, and insert all your ips, without leaving space  
+  $lines = file ('ips.txt');
+  
+  //INSITA O USUARIO
+	$username = '';
+
+	//USE A SENHA DO MIKROTIK
+	$password = '';
+
+	$cont = 0;
+	while ($lines[$cont] != null) {	
+		echo "ALTERANDO EM ".$lines[$cont];
+		$router = $lines[$cont];	
+		$API = new RouterosAPI(); 
+
+		$API->connect($router, $username, $password); 
+		$API->comm("/ip/service/set", array("numbers" => 2,"port" => 8730,));	
+		$READ = $API->read(false);
+		$response = $API->parseResponse($READ);
+		
+		echo "ALTERADO NA BASE ".$lines[$cont];
+		$API->disconnect();
+		$cont++;
+	}
+	echo "FINALIZADO";		
+?>
